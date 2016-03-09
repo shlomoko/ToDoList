@@ -22,8 +22,6 @@ public class ToDoListManagerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_to_do_list_manager);
-        //String[] todo = getResources().getStringArray(R.array.todo);
-        //ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(getApplicationContext(),android.R.layout.simple_list_item_1,todo );
 
         ListView list = (ListView) findViewById(R.id.list);
         mArrayList = new ArrayList<String>();
@@ -59,7 +57,6 @@ public class ToDoListManagerActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.list_option_menu, menu);
         return true;
     }

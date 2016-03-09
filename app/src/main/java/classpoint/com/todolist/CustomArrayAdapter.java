@@ -15,23 +15,25 @@ import java.util.List;
  */
 public class CustomArrayAdapter extends ArrayAdapter<String> {
     private List<String> mList;
-
+    private int mId;
+    private int resource;
     public CustomArrayAdapter(Context context, int textViewResourceId, int id, List<String> list)
     {
         super(context, textViewResourceId, id, list);
         mList = list;
+        mId = id;
+        resource = textViewResourceId;
     }
 
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        //super(position,convertView,parent);
         View v = convertView;
         if (v == null) {
             LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            v = inflater.inflate(R.layout.list_layout, null);
+            v = inflater.inflate(resource, null);
         }
-        TextView textView= (TextView) v.findViewById(R.id.lstTodoItems);
+        TextView textView= (TextView) v.findViewById(mId);
         textView.setText(mList.get(position));
         if(position%2 == 0){
             textView.setTextColor(Color.GREEN);
