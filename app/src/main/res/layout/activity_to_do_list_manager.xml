@@ -10,11 +10,6 @@
     tools:context="classpoint.com.todolist.ToDoListManagerActivity"
     android:orientation="vertical">
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/edtNewItem"
-        android:inputType="text"/>
     <ListView
         android:id="@+id/list"
         android:layout_width="wrap_content"

@@ -13,7 +13,12 @@
         android:gravity="top"
         android:id="@+id/textViewTitle" />
 
-\
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/call_option"
+        android:textColor="#000000" />
+
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
