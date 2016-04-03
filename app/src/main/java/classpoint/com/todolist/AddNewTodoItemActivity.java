@@ -45,7 +45,7 @@ public class AddNewTodoItemActivity extends Activity {
                 Date date = cal.getTime();
                 Intent result = new Intent();
                 result.putExtra("title", strEditText);
-                result.putExtra("dueDate", date.getTime());
+                result.putExtra("dueDate", date);
                 setResult(RESULT_OK, result);
                 finish();
             }

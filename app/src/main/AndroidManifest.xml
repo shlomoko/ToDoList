@@ -20,7 +20,8 @@
 
         <activity android:name=".AddNewTodoItemActivity">
             <intent-filter>
-                <action android:name="android.intent.action.SENDTO"/>
+                <action android:name="android.intent.action.SENDTO" />
+
             </intent-filter>
         </activity>
     </application>

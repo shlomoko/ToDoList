@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -23,16 +24,18 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class ToDoListManagerActivity extends AppCompatActivity {
-    private ArrayList<CustomItem> mArrayList;
-    private CustomArrayAdapter mCustomAdapter;
+    //private ArrayList<CustomItem> mArrayList;
+    private MyCursorAdaptor mCustomAdapter;
+    private DBHelper list_db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_to_do_list_manager);
 
         ListView list = (ListView) findViewById(R.id.list);
-        mArrayList = new ArrayList<CustomItem>();
-        mCustomAdapter = new CustomArrayAdapter(getApplicationContext(), R.layout.list_layout, mArrayList);
+        list_db = DBHelper.getInstance(getApplicationContext());
+        //mArrayList = new ArrayList<CustomItem>();
+        mCustomAdapter = new MyCursorAdaptor(getApplicationContext(), list_db.getData(), 0);
         list.setAdapter(mCustomAdapter);
 
         list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -40,15 +43,18 @@ public class ToDoListManagerActivity extends AppCompatActivity {
                 final Dialog dialog = new Dialog(ToDoListManagerActivity.this);
                 LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 View bodyView = inflater.inflate(R.layout.dialog_body, null);
-                dialog.setTitle(mArrayList.get(position).task);
-                if (mArrayList.get(position).task.startsWith("call") || mArrayList.get(position).task.startsWith("Call")){
+                Cursor cursor = (mCustomAdapter).getCursor();
+                cursor.moveToPosition(position);
+                final String title = cursor.getString(cursor.getColumnIndex(DBHelper.TITLE));
+                dialog.setTitle(title);
+                if (title.toLowerCase().startsWith("call")){
                     Button textView = (Button) bodyView.findViewById(R.id.call_option);
-                    textView.setText(mArrayList.get(position).task);
+                    textView.setText(title);
                     textView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             String del = "[ ]+";
-                            String[] tokens = (mArrayList.get(position).task).split(del);
+                            String[] tokens = (title).split(del);
                            Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + tokens[1]));
                            startActivity(intent);
                         }
@@ -60,7 +66,10 @@ public class ToDoListManagerActivity extends AppCompatActivity {
                 deleteButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mArrayList.remove(mArrayList.get(position));
+//                        mArrayList.remove(mArrayList.get(position));
+//                        Cursor cursor = (mCustomAdapter).getCursor();
+//                        cursor.moveToPosition(position);
+                        list_db.delete(position);
                         mCustomAdapter.notifyDataSetChanged();
                         dialog.dismiss();
                     }
@@ -98,24 +107,30 @@ public class ToDoListManagerActivity extends AppCompatActivity {
         {
             case 01:
                 String title ="";
-                Date newDate= new Date();
+                Long newDate = Long.valueOf(0);
                 if(data.hasExtra("title"))
                 {
                     title = data.getStringExtra("title");
                 }
                 if(data.hasExtra("dueDate"))
                 {
-                    newDate.setTime(data.getLongExtra("dueDate", -1));
+                    newDate= data.getLongExtra("dueDate", 0);
                 }
-                CustomItem item = new CustomItem(title,newDate);
-                if(!item.task.isEmpty()) {
-                    mArrayList.add(item);
-                }
+                //CustomItem item = new CustomItem(title,newDate);
+                list_db.insertToDo(title,newDate);
+//                if(!item.task.isEmpty()) {
+//                    mArrayList.add(item);
+//                }
+                mCustomAdapter.changeCursor(list_db.getData());
                 mCustomAdapter.notifyDataSetChanged();
                 break;
-
         }
+        list_db.close();
     }
-
+    @Override
+    protected void onDestroy() {
+        list_db.close();
+        super.onDestroy();
+    }
 
 }
