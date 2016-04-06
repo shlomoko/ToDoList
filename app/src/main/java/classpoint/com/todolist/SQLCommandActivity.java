@@ -6,24 +6,22 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import java.util.Calendar;
-
-public class DBHelper extends SQLiteOpenHelper{
-    private static DBHelper singletonDB;
+public class SQLCommandActivity extends SQLiteOpenHelper{
+    private static SQLCommandActivity singletonDB;
     public static final String TABLE_NAME = "todo";
     public static final String ID = "_id";
     public static final String TITLE = "name";
     public static final String DATE = "date";
 
 
-    private DBHelper(Context context){
+    private SQLCommandActivity(Context context){
         super(context, "todo_db",null,1);
     }
 
 
-    public static DBHelper getInstance(Context context){
+    public static SQLCommandActivity getInstance(Context context){
         if(singletonDB==null){
-            singletonDB = new DBHelper(context);
+            singletonDB = new SQLCommandActivity(context);
         }
         return singletonDB;
     }
@@ -86,20 +84,20 @@ public class DBHelper extends SQLiteOpenHelper{
 ///**
 // * Created by Shlomo on 01/04/2016.
 // */
-//public class DBHelper extends SQLiteOpenHelper{
+//public class SQLCommandActivity extends SQLiteOpenHelper{
 //    public static final String TABLE_NAME = "TodoList";
 //    public static final String ID = "id";
 //    public static final String TITLE = "title";
 //    public static final String DATE = "date";
-//    private static DBHelper singletonDB;
+//    private static SQLCommandActivity singletonDB;
 //
-//    private DBHelper(Context context){
+//    private SQLCommandActivity(Context context){
 //            super(context, "todo_db" ,null,1);
 //    }
 //
-//    public static DBHelper getInstance(Context context){
+//    public static SQLCommandActivity getInstance(Context context){
 //        if(singletonDB==null){
-//            singletonDB = new DBHelper(context);
+//            singletonDB = new SQLCommandActivity(context);
 //        }
 //        return singletonDB;
 //    }

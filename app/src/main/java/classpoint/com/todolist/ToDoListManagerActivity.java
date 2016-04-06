@@ -1,12 +1,10 @@
 package classpoint.com.todolist;
 
-import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,25 +13,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.Date;
 
 public class ToDoListManagerActivity extends AppCompatActivity {
     //private ArrayList<CustomItem> mArrayList;
     private MyCursorAdaptor mCustomAdapter;
-    private DBHelper list_db;
+    private SQLCommandActivity list_db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_to_do_list_manager);
 
         ListView list = (ListView) findViewById(R.id.list);
-        list_db = DBHelper.getInstance(getApplicationContext());
+        list_db = SQLCommandActivity.getInstance(getApplicationContext());
         //mArrayList = new ArrayList<CustomItem>();
         mCustomAdapter = new MyCursorAdaptor(getApplicationContext(), list_db.getData(), 0);
         list.setAdapter(mCustomAdapter);
@@ -45,7 +37,7 @@ public class ToDoListManagerActivity extends AppCompatActivity {
                 View bodyView = inflater.inflate(R.layout.dialog_body, null);
                 Cursor cursor = (mCustomAdapter).getCursor();
                 cursor.moveToPosition(position);
-                final String title = cursor.getString(cursor.getColumnIndex(DBHelper.TITLE));
+                final String title = cursor.getString(cursor.getColumnIndex(SQLCommandActivity.TITLE));
                 dialog.setTitle(title);
                 if (title.toLowerCase().startsWith("call")){
                     Button textView = (Button) bodyView.findViewById(R.id.call_option);
@@ -67,9 +59,11 @@ public class ToDoListManagerActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
 //                        mArrayList.remove(mArrayList.get(position));
-//                        Cursor cursor = (mCustomAdapter).getCursor();
-//                        cursor.moveToPosition(position);
-                        list_db.delete(position);
+                        Cursor cursor = (mCustomAdapter).getCursor();
+                        cursor.moveToPosition(position);
+                        int todelete = cursor.getInt(cursor.getColumnIndex(SQLCommandActivity.ID));
+                        list_db.delete(todelete);
+                        mCustomAdapter.changeCursor(list_db.getData());
                         mCustomAdapter.notifyDataSetChanged();
                         dialog.dismiss();
                     }

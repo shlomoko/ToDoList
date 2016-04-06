@@ -28,10 +28,10 @@ public class MyCursorAdaptor extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         TextView textView= (TextView) view.findViewById(R.id.lstTodoItems);
-        String title = cursor.getString(cursor.getColumnIndex(DBHelper.TITLE));
+        String title = cursor.getString(cursor.getColumnIndex(SQLCommandActivity.TITLE));
         textView.setText(title);
         TextView date = (TextView) view.findViewById(R.id.date);
-        Long showdate = cursor.getLong(cursor.getColumnIndex(DBHelper.DATE));
+        Long showdate = cursor.getLong(cursor.getColumnIndex(SQLCommandActivity.DATE));
         System.out.println(showdate);
         Date nowDate = new Date(showdate);
         date.setText(nowDate.toString());
