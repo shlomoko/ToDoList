@@ -32,7 +32,9 @@ public class MyCursorAdaptor extends CursorAdapter {
         textView.setText(title);
         TextView date = (TextView) view.findViewById(R.id.date);
         Long showdate = cursor.getLong(cursor.getColumnIndex(DBHelper.DATE));
-        date.setText(showdate.toString());
+        System.out.println(showdate);
+        Date nowDate = new Date(showdate);
+        date.setText(nowDate.toString());
         Long currentDate = new Date().getTime();
         //if (mList.get(position).date.getYear() < year || (mList.get(position).date.getYear()== year && mList.get(position).date.getMonth())){
         if(showdate < currentDate){

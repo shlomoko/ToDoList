@@ -42,7 +42,7 @@ public class AddNewTodoItemActivity extends Activity {
                 int year = datePicker.getYear();
                 Calendar cal = Calendar.getInstance();
                 cal.set(year,month,day);
-                Date date = cal.getTime();
+                Long date = cal.getTimeInMillis();
                 Intent result = new Intent();
                 result.putExtra("title", strEditText);
                 result.putExtra("dueDate", date);
