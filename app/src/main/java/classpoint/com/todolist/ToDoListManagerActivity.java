@@ -1,16 +1,19 @@
 package classpoint.com.todolist;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
@@ -19,6 +22,7 @@ public class ToDoListManagerActivity extends AppCompatActivity {
     //private ArrayList<CustomItem> mArrayList;
     private MyCursorAdaptor mCustomAdapter;
     private SQLCommandActivity list_db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +43,7 @@ public class ToDoListManagerActivity extends AppCompatActivity {
                 cursor.moveToPosition(position);
                 final String title = cursor.getString(cursor.getColumnIndex(SQLCommandActivity.TITLE));
                 dialog.setTitle(title);
-                if (title.toLowerCase().startsWith("call")){
+                if (title.toLowerCase().startsWith("call")) {
                     Button textView = (Button) bodyView.findViewById(R.id.call_option);
                     textView.setText(title);
                     textView.setOnClickListener(new View.OnClickListener() {
@@ -47,8 +51,8 @@ public class ToDoListManagerActivity extends AppCompatActivity {
                         public void onClick(View v) {
                             String del = "[ ]+";
                             String[] tokens = (title).split(del);
-                           Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + tokens[1]));
-                           startActivity(intent);
+                            Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + tokens[1]));
+                            startActivity(intent);
                         }
                     });
                 }
@@ -77,41 +81,36 @@ public class ToDoListManagerActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.list_option_menu, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        switch (item.getItemId()){
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
             case R.id.menuItemAdd:
                 Intent intent = new Intent(getApplicationContext(), AddNewTodoItemActivity.class);
                 startActivityForResult(intent, 01);
                 return true;
         }
-        return  false;
+        return false;
     }
 
 
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        switch (requestCode)
-        {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
             case 01:
-                String title ="";
+                String title = "";
                 Long newDate = Long.valueOf(0);
-                if(data.hasExtra("title"))
-                {
+                if (data.hasExtra("title")) {
                     title = data.getStringExtra("title");
                 }
-                if(data.hasExtra("dueDate"))
-                {
-                    newDate= data.getLongExtra("dueDate", 0);
+                if (data.hasExtra("dueDate")) {
+                    newDate = data.getLongExtra("dueDate", 0);
                 }
                 //CustomItem item = new CustomItem(title,newDate);
-                list_db.insertToDo(title,newDate);
+                list_db.insertToDo(title, newDate);
 //                if(!item.task.isEmpty()) {
 //                    mArrayList.add(item);
 //                }
@@ -119,12 +118,52 @@ public class ToDoListManagerActivity extends AppCompatActivity {
                 mCustomAdapter.notifyDataSetChanged();
                 break;
         }
-        list_db.close();
+        //list_db.close();
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        new AsyncTaskActivity().execute();
+    }
+
     @Override
     protected void onDestroy() {
         list_db.close();
         super.onDestroy();
     }
 
+
+    private class AsyncTaskActivity extends AsyncTask<Void, Cursor, Void> {
+        ProgressDialog pdLoading = new ProgressDialog(ToDoListManagerActivity.this);
+
+        @Override
+        protected void onPostExecute(Void result) {
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            Cursor cursor = list_db.getData();
+            publishProgress(cursor);
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pdLoading = new ProgressDialog(ToDoListManagerActivity.this);
+            pdLoading.setMessage("Loading ...");
+            pdLoading.setIndeterminate(false);
+            pdLoading.show();
+        }
+
+        @Override
+        protected void onProgressUpdate(Cursor... values) {
+            ListView lv = (ListView) findViewById(R.id.list);
+            MyCursorAdaptor adapter = new MyCursorAdaptor(ToDoListManagerActivity.this, values[0], 0);
+            lv.setAdapter(adapter);
+            pdLoading.dismiss();
+        }
+    }
 }
