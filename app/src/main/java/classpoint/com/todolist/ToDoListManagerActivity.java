@@ -31,9 +31,12 @@ public class ToDoListManagerActivity extends AppCompatActivity {
         ListView list = (ListView) findViewById(R.id.list);
         list_db = SQLCommandActivity.getInstance(getApplicationContext());
         //mArrayList = new ArrayList<CustomItem>();
+        for(int i=1; i<1000; i++){
+            list_db.insertToDo("hi",123455678L);
+        }
         mCustomAdapter = new MyCursorAdaptor(getApplicationContext(), list_db.getData(), 0);
         list.setAdapter(mCustomAdapter);
-
+        new AsyncTaskActivity().execute();
         list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
                 final Dialog dialog = new Dialog(ToDoListManagerActivity.this);
@@ -145,17 +148,25 @@ public class ToDoListManagerActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... params) {
             Cursor cursor = list_db.getData();
-            publishProgress(cursor);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            while(cursor != list_db.getData()) {
+                try {
+                    publishProgress(cursor);
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
             return null;
         }
 
         @Override
         protected void onPreExecute() {
-            super.onPreExecute();
-            pdLoading = new ProgressDialog(ToDoListManagerActivity.this);
-            pdLoading.setMessage("Loading ...");
-            pdLoading.setIndeterminate(false);
-            pdLoading.show();
         }
 
         @Override
@@ -163,7 +174,8 @@ public class ToDoListManagerActivity extends AppCompatActivity {
             ListView lv = (ListView) findViewById(R.id.list);
             MyCursorAdaptor adapter = new MyCursorAdaptor(ToDoListManagerActivity.this, values[0], 0);
             lv.setAdapter(adapter);
-            pdLoading.dismiss();
+            mCustomAdapter.changeCursor(list_db.getData());
+            mCustomAdapter.notifyDataSetChanged();
         }
     }
 }
